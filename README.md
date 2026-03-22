@@ -2,25 +2,46 @@
 
 Write Playwright E2E tests in plain English and let an [AI page agent](https://www.npmjs.com/package/page-agent) drive the browser. This package wires **Playwright Test**, a **Node-side LLM proxy** (no API key in the page), and the bundled **page-agent** UI runtime.
 
+This repository is **public** for reference and transparency. **Published packages are not distributed as a public registry install**—how you obtain releases (private feed, internal tooling, tarball, or building here) is up to your organization.
+
 ## Requirements
 
 - Node 18+ (or Bun)
 
 ## Install
 
+Use whichever source your team uses for private artifacts. This README intentionally does **not** document a specific registry, scope, or URL.
+
+### Option A — Build from this repository
+
 ```bash
-npm install playwright-page-agent
+git clone <repository-url>
+cd playwright-page-agent
+bun install
+bun run build
 ```
 
-**What you actually need:** The **in-browser** page-agent UI is already **bundled** in this package (`dist/page-agent.js` when you build or from npm). You do **not** install `page-agent` separately just to get that script.
+Point your app at the checkout with a **file dependency**, **`npm link` / `bun link`**, or your monorepo workspace, then install peers in that app:
 
-`package.json` still declares **peer dependencies** on `@playwright/test` and `page-agent` so your app uses one shared Playwright install and TypeScript can resolve types such as `PageAgentConfig` (see `dist/index.d.ts`). **npm 7+** usually installs missing peers for you when you run the command above. If your package manager does not, add them explicitly:
+```bash
+npm install @playwright/test page-agent
+```
+
+(Use the same package manager you use for the rest of the project.)
+
+### Option B — Private package install
+
+After your package manager is configured for your organization’s registry (per internal docs—`.npmrc`, tokens, etc.), install the package name defined in this repo’s `package.json` together with its **peer dependencies**:
 
 ```bash
 npm install playwright-page-agent @playwright/test page-agent
 ```
 
-Install browsers if you have not already:
+Adjust the command for `pnpm` / `yarn` / `bun` as needed.
+
+**Peers:** The in-browser page-agent UI is **bundled** inside this package (`dist/page-agent.js`). Peers exist so you share one Playwright install and TypeScript can resolve types such as `PageAgentConfig`. Your package manager may install missing peers automatically; if not, add `@playwright/test` and `page-agent` explicitly.
+
+### Playwright browsers
 
 ```bash
 npx playwright install
