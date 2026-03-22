@@ -11,8 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     # Repository secrets (Settings → Secrets and variables → Actions):
-    #   NPM_AUTH_TOKEN — npm automation token (below: ~/.npmrc for registry-aware tooling + publish action).
+    #   NPM_AUTH_TOKEN — npm automation token with publish access.
     steps:
       - uses: actions/checkout@v4
 
@@ -34,47 +35,11 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build
 
-      - name: Get package version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@main
-
-      - name: Check if version already exists on npm
-        id: check_version_exists
-        run: |
-          PACKAGE_NAME=$(jq -r .name package.json)
-          PACKAGE_VERSION="${{ steps.package-version.outputs.current-version }}"
-
-          echo "Checking if version $PACKAGE_VERSION of $PACKAGE_NAME already exists on npm..."
-
-          NPM_VERSIONS_JSON=$(npm view "$PACKAGE_NAME" versions --json || echo "[]")
-
-          if echo "$NPM_VERSIONS_JSON" | jq -e ".[] == \"$PACKAGE_VERSION\"" > /dev/null; then
-            echo "Version $PACKAGE_VERSION already exists on npm. Skipping publish."
-            echo "version_exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Version $PACKAGE_VERSION does not exist on npm. Proceeding with publish."
-            echo "version_exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Tag commit with release version
-        id: tag_version
-        if: steps.check_version_exists.outputs.version_exists != 'true'
-        uses: mathieudutour/github-tag-action@v6.0
+      - name: Create Release PR or Publish to npm
+        uses: changesets/action@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ steps.package-version.outputs.current-version }}
-
-      - name: Create a GitHub release
-        if: steps.check_version_exists.outputs.version_exists != 'true'
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
-
-      - name: Publish package to NPM
-        if: steps.check_version_exists.outputs.version_exists != 'true'
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_AUTH_TOKEN }}
-          access: public
+          publish: bun run release
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
