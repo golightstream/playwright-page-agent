@@ -40,7 +40,7 @@ jobs:
         env:
           PACKAGE_VERSION: ${{ steps.package-version.outputs.current-version }}
         run: |
-          PACKAGE_NAME="playwright-page-agent"
+          PACKAGE_NAME="@golightstream/playwright-page-agent"
 
           echo "Checking if version $PACKAGE_VERSION of $PACKAGE_NAME already exists on npm..."
 
