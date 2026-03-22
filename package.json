@@ -1,6 +1,6 @@
 {
-  "name": "@golightstream/playwright-page-agent",
-  "version": "0.2.0",
+  "name": "playwright-page-agent",
+  "version": "0.3.0",
   "description": "Write your Playwright E2E tests in plain English and let an AI agent execute them.",
   "type": "module",
   "main": "dist/index.js",
