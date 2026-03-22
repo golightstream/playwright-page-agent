@@ -9,9 +9,10 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # Repository secrets (Settings → Secrets and variables → Actions):
-    #   NPM_TOKEN — npm automation token (below: ~/.npmrc for registry-aware tooling + publish action).
-    #   SERVICEACCOUNT_GITHUB_TOKEN — PAT for tagging/releases (optional: use GITHUB_TOKEN if you do not need downstream workflows on tag).
+    #   NPM_AUTH_TOKEN — npm automation token (below: ~/.npmrc for registry-aware tooling + publish action).
     steps:
       - uses: actions/checkout@v4
 
@@ -60,7 +61,7 @@ jobs:
         if: steps.check_version_exists.outputs.version_exists != 'true'
         uses: mathieudutour/github-tag-action@v6.0
         with:
-          github_token: ${{ secrets.SERVICEACCOUNT_GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_tag: ${{ steps.package-version.outputs.current-version }}
 
       - name: Create a GitHub release
