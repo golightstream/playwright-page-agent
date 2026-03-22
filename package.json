@@ -1,6 +1,6 @@
 {
   "name": "@golightstream/playwright-page-agent",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Write your Playwright E2E tests in plain English and let an AI agent execute them.",
   "type": "module",
   "main": "dist/index.js",
@@ -24,7 +24,13 @@
     "prepublishOnly": "bun run build",
     "release": "changeset publish"
   },
-  "keywords": ["playwright", "page-agent", "e2e", "ai", "testing"],
+  "keywords": [
+    "playwright",
+    "page-agent",
+    "e2e",
+    "ai",
+    "testing"
+  ],
   "license": "MIT",
   "peerDependencies": {
     "@playwright/test": ">=1.50.0",
